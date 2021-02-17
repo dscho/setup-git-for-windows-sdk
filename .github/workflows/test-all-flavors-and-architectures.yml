@@ -1,0 +1,43 @@
+name: 'test'
+on:
+  push:
+    branches:
+      - test
+
+jobs:
+  test: # make sure the action works on a clean machine without building
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        flavor: [minimal, makepkg-git, build-installers, full]
+        architecture: [x86_64, i686]
+        exclude:
+          - flavor: minimal
+            architecture: i686
+          - flavor: makepkg-git
+            architecture: i686
+    steps:
+      - name: Set up ${{matrix.flavor}} ${{matrix.architecture}}
+        uses: dscho/setup-git-for-windows-sdk@test
+        with:
+          flavor: ${{matrix.flavor}}
+          architecture: ${{matrix.architecture}}
+      - name: Verify that the Bash of Git for Windows' SDK is used
+        shell: bash
+        run: |
+          set -x
+          echo "This is the MSYS2 pseudo root: $(cygpath -aw /)"
+          printf '%s\n' \
+            "#include <stdio.h>" \
+            '' \
+            'int main()' \
+            '{' \
+            '  printf("Hello, world!\n");' \
+            '  return 0;' \
+            '}' >hello-world.c
+          gcc -o hello-world.exe hello-world.c
+          hello="$(./hello-world.exe)"
+          test 'Hello, world!' = "$hello"
+          ls -l /.sparse/ || :
+          ls -l /
