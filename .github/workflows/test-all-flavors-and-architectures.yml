@@ -27,18 +27,17 @@ jobs:
         shell: bash
         run: |
           set -x
-          cat $GITHUB_ENV
-          echo ====
-          cat $GITHUB_PATH
+          echo $PATH
+          cat /etc/profile
           pwd
           uname -s
-          uname -a
-          echo $MSYSTEM
+          ls -l /mingw64/bin/gcc.exe
+          type gcc.exe
+          which gcc.exe
           env
-          which gcc
           echo "This is the MSYS2 pseudo root: $(cygpath -aw /)"
           curl \
             -LH "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/git-for-windows/git/tarball/HEAD |
-          tar xzvf -
+          tar -xzf - --strip-components=1
           make -j8
