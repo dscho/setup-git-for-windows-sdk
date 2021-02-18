@@ -18,6 +18,7 @@ async function run(): Promise<void> {
 
     const {artifactName, download, id} = await get(flavor, architecture)
     const outputDirectory = core.getInput('path') || `C:/${artifactName}`
+    core.info(`Writing to ${outputDirectory}`)
     let useCache: boolean
     switch (core.getInput('cache')) {
       case 'true':
