@@ -54,6 +54,7 @@ async function run(): Promise<void> {
     }
 
     // Set up PATH so that Git for Windows' SDK's `bash.exe` is found
+    core.info(`Adding to PATH: ${outputDirectory}/usr/bin`)
     core.addPath(`${outputDirectory}/usr/bin`)
     const msystem = architecture === 'i686' ? 'MING32' : 'MINGW64'
     core.addPath(`${outputDirectory}/${msystem.toLocaleLowerCase()}/bin`)
