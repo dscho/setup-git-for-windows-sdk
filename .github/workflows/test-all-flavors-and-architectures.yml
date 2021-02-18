@@ -28,21 +28,14 @@ jobs:
         run: |
           set -x
           pwd
+          uname -s
           uname -a
           echo $MSYSTEM
           env
           which gcc
           echo "This is the MSYS2 pseudo root: $(cygpath -aw /)"
-          printf '%s\n' \
-            "#include <stdio.h>" \
-            '' \
-            'int main()' \
-            '{' \
-            '  printf("Hello, world!\n");' \
-            '  return 0;' \
-            '}' >hello-world.c
-          gcc -o hello-world.exe hello-world.c
-          hello="$(./hello-world.exe)"
-          test 'Hello, world!' = "$hello"
-          ls -l /.sparse/ || :
-          ls -l /
+          curl \
+            -LH "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/git-for-windows/git/tarball/HEAD |
+          tar xzvf -
+          make -j8
