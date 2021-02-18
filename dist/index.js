@@ -55,6 +55,7 @@ function run() {
             const verbose = core.getInput('verbose');
             const { artifactName, download, id } = yield downloader_1.get(flavor, architecture);
             const outputDirectory = core.getInput('path') || `C:/${artifactName}`;
+            core.info(`Writing to ${outputDirectory}`);
             let useCache;
             switch (core.getInput('cache')) {
                 case 'true':
@@ -66,24 +67,30 @@ function run() {
                 default:
                     useCache = false;
             }
+            let needToDownload = true;
             try {
                 if (useCache && (yield cache_1.restoreCache([outputDirectory], id))) {
                     core.info(`Cached ${id} was successfully restored`);
-                    return;
+                    needToDownload = false;
                 }
             }
             catch (e) {
                 core.warning(`Cannot use @actions/cache (${e})`);
                 useCache = false;
             }
-            core.info(`Downloading ${artifactName}`);
-            yield download(outputDirectory, verbose.match(/^\d+$/) ? parseInt(verbose) : verbose === 'true');
-            if (useCache && !(yield cache_1.saveCache([outputDirectory], id))) {
-                core.warning(`Failed to cache ${id}`);
+            if (needToDownload) {
+                core.info(`Downloading ${artifactName}`);
+                yield download(outputDirectory, verbose.match(/^\d+$/) ? parseInt(verbose) : verbose === 'true');
+                if (useCache && !(yield cache_1.saveCache([outputDirectory], id))) {
+                    core.warning(`Failed to cache ${id}`);
+                }
             }
             // Set up PATH so that Git for Windows' SDK's `bash.exe` is found
+            core.info(`Adding to PATH: ${outputDirectory}/usr/bin`);
             core.addPath(`${outputDirectory}/usr/bin`);
-            core.exportVariable('MSYSTEM', architecture === 'i686' ? 'MING32' : 'MINGW64');
+            const msystem = architecture === 'i686' ? 'MING32' : 'MINGW64';
+            core.addPath(`${outputDirectory}/${msystem.toLocaleLowerCase()}/bin`);
+            core.exportVariable('MSYSTEM', msystem);
         }
         catch (error) {
             core.setFailed(error.message);
