@@ -27,6 +27,9 @@ jobs:
         shell: bash
         run: |
           set -x
+          cat $GITHUB_ENV
+          echo ====
+          cat $GITHUB_PATH
           pwd
           uname -s
           uname -a
