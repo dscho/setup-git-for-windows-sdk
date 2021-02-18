@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flavor: [minimal, makepkg-git, build-installers, full]
+        flavor: [minimal]
         architecture: [x86_64, i686]
         exclude:
           - flavor: minimal
@@ -27,6 +27,11 @@ jobs:
         shell: bash
         run: |
           set -x
+          pwd
+          uname -a
+          echo $MSYSTEM
+          env
+          which gcc
           echo "This is the MSYS2 pseudo root: $(cygpath -aw /)"
           printf '%s\n' \
             "#include <stdio.h>" \
