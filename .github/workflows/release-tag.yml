@@ -2,8 +2,10 @@ name: Auto-publish tags
 
 on:
   push:
-    tags:
-    - 'v*' # Push events to release tags
+    branches:
+      - auto-release-on-tag
+    # tags:
+    # - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
   build:
@@ -34,13 +36,19 @@ jobs:
             exit 1
           }
 
-          ref="${{ github.ref }}"
+          ref=refs/tags/v0.0.999 # "${{ github.ref }}"
           tag_name=${ref#refs/tags/}
           test "x$ref" != "x$tag_name" || die "Not a tag: $ref"
 
           train="$(echo "$tag_name" | sed -n 's|^\(v[0-9][0-9]*\)[.0-9]*$|\1|p')"
           test -n "$train" || die "Unexpected tag name: $tag_name"
           echo "$train" >train
+
+          # ONLY FOR DEBUGGING
+          train_ref_spec=refs/heads/$train:refs/remotes/origin/$train
+          test "$train.0.0" != "$tag_name" || train_ref_spec=
+          git fetch --tags https://github.com/git-for-windows/setup-git-for-windows-sdk \
+            refs/heads/main:refs/remotes/origin/main $train_ref_spec
 
           if train_rev="$(git rev-parse --verify "refs/remotes/origin/$train")"
           then
@@ -62,6 +70,8 @@ jobs:
 
           echo "$tag_name" >tag_name
           git cat-file tag "$ref" | sed -e '1,/^$/d' -e '/-----BEGIN PGP SIGNATURE-----/,$d' >body
+
+          printf '\nwith\nlines\n' >>body
       - name: Create Release
         if: github.repository_owner == 'git-for-windows'
         uses: actions/github-script@v3
@@ -79,5 +89,5 @@ jobs:
               body: readFileSync('body').toString()
             })
       - name: Push to release train branch
-        if: github.repository_owner == 'git-for-windows'
+        if: github.repository_owner == 'dscho'
         run: git push origin "${{ github.ref }}^0:refs/heads/$(cat train)"
