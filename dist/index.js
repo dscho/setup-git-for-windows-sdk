@@ -55,6 +55,7 @@ function run() {
             const msysMode = core.getInput('msys') === 'true';
             const { artifactName, download, id } = yield (0, downloader_1.get)(flavor, architecture);
             const outputDirectory = core.getInput('path') || `C:/${artifactName}`;
+            core.info(`Writing to ${outputDirectory}`);
             let useCache;
             switch (core.getInput('cache')) {
                 case 'true':
