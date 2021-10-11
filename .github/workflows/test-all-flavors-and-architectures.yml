@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flavor: [minimal]
+        flavor: [minimal, makepkg-git, build-installers, full]
         architecture: [x86_64, i686]
         exclude:
           - flavor: minimal
