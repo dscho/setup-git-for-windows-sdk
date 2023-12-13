@@ -92,7 +92,7 @@ export async function getViaGit(
     verbose?: number | boolean
   ) => Promise<void>
 }> {
-  const owner = 'git-for-windows'
+  const owner = 'dscho'
 
   const {repo, artifactName} = getArtifactMetadata(flavor, architecture)
 
