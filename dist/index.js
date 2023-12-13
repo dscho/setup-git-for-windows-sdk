@@ -357,7 +357,7 @@ function clone(url, destination, verbose, cloneExtraOptions = []) {
 }
 function getViaGit(flavor, architecture, githubToken) {
     return __awaiter(this, void 0, void 0, function* () {
-        const owner = 'git-for-windows';
+        const owner = 'dscho';
         const { repo, artifactName } = getArtifactMetadata(flavor, architecture);
         const octokit = githubToken ? new rest_1.Octokit({ auth: githubToken }) : new rest_1.Octokit();
         let head_sha;
